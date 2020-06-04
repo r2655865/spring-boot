@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" href="/layui/css/formSelects-v4.css"/>
+<head th:replace="header" th:with="title='流程定义管理'"></head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!--头-->
+    <div th:replace="fragments/head :: header"></div>
+
+
+    <div class="layui-body" style="margin: 1%">
+
+        <table id="modelList" lay-filter="procdefsTable"></table>
+
+        <script type="text/html" id="optBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="downLoad">下载</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="view">查看</a>
+            <a class="layui-btn layui-btn layui-btn-xs" lay-event="editRole">设置</a>
+        </script>
+    </div>
+
+    <!--查看-->
+    <div id="procDefImage">
+        <img id="processImg" width="100%"/>
+    </div>
+
+
+
+
+    <div id="candidateData_form" class="layer_self_wrap" style="display:none;">
+        <table class="layui-table">
+            <tr>
+                <td><strong>任务名称</strong></td>
+                <td><strong>配置选项类型</strong></td>
+            </tr>
+            <tr v-for="(candidate,index) in Candidates">
+                <td style="width:100px;">{{candidate.taskName}}</td>
+                <td style="width:100px;">
+                    <select :id="candidate.taskDefKey" v-model="candidate.candidateIds" style="width:100px" >
+                        <option v-for="item in roleList" :value="item.code">{{item.roleName}}</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left: 10px;">
+                <button class="layui-btn"    v-on:click="saveData()"  type="button">提交</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--底部-->
+    <div th:replace="fragments/footer :: footer"></div>
+    <script src="/js/model/procdefs.js"></script>
+
+</div>
+</body>
+</html>

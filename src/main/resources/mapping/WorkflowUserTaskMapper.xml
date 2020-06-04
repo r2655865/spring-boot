@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.activiti.mapper.WorkflowUserTaskMapper">
+    <resultMap id="BaseResultMap" type="com.activiti.pojo.WorkflowUserTask">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="proc_def_key" jdbcType="VARCHAR" property="procDefKey"/>
+        <result column="proc_def_name" jdbcType="VARCHAR" property="procDefName"/>
+        <result column="task_def_key" jdbcType="VARCHAR" property="taskDefKey"/>
+        <result column="task_name" jdbcType="VARCHAR" property="taskName"/>
+        <result column="task_type" jdbcType="VARCHAR" property="taskType"/>
+        <result column="candidate_name" jdbcType="VARCHAR" property="candidateName"/>
+        <result column="candidate_ids" jdbcType="VARCHAR" property="candidateIds"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="created" jdbcType="TIMESTAMP" property="created"/>
+    </resultMap>
+    <sql id="basic_list">
+		a.id,a.proc_def_key,a.proc_def_name,a.task_def_key,a.task_name,a.task_type,a.candidate_name,a.candidate_ids,a.status,a.created
+	</sql>
+    <select id="listWorkflowUserTaskByDefKeyAndTaskKey" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="basic_list"/>
+        FROM kb_workflow_user_task a
+        <where>
+            a.proc_def_key=#{procDefKey}
+            and a.task_def_key=#{taskDefKey}
+        </where>
+    </select>
+
+    <select id="listWorkflowUserTaskByDefKey" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="basic_list"/>
+        FROM kb_workflow_user_task a
+        <where>
+            a.proc_def_key=#{procDefKey}
+        </where>
+    </select>
+
+
+    <select id="getOneByWorkflowUserTaskByDefKeyAndTaskKey" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="basic_list"/>
+        FROM kb_workflow_user_task a
+        <where>
+            a.proc_def_key=#{procDefKey}
+            and a.task_def_key=#{taskDefKey}
+        </where>
+    </select>
+
+
+    <select id="getBpmnData" parameterType="string" resultType="string">
+        SELECT
+            CAST(c.BYTES_ AS CHAR)
+        FROM
+            ACT_HI_TASKINST a
+        LEFT JOIN ACT_RE_PROCDEF b ON a.PROC_DEF_ID_=b.ID_
+        LEFT JOIN ACT_GE_BYTEARRAY c ON b.DEPLOYMENT_ID_=c.DEPLOYMENT_ID_
+        AND  c.NAME_=b.RESOURCE_NAME_
+        WHERE
+            PROC_INST_ID_ = #{instanceId} AND c.GENERATED_=0 LIMIT 0,1
+    </select>
+
+
+    <select id="getProcessList" parameterType="map" resultType="map">
+        SELECT
+            RES.PROC_DEF_ID_ as processDefinitionId,
+            RES.PROC_INST_ID_ as processInstanceId,
+            i.USER_ID_ as applyUserId,
+            D.NAME_ as processName
+        FROM
+            ACT_RU_TASK RES
+            INNER JOIN ACT_RE_PROCDEF D ON RES.PROC_DEF_ID_ = D.ID_
+            INNER JOIN kb_workflow_hospital wh on wh.process_instance_id = RES.PROC_INST_ID_
+            left join ACT_RU_IDENTITYLINK i on i.PROC_INST_ID_ = RES.PROC_INST_ID_ and i.TYPE_='starter'
+        WHERE
+            RES.ASSIGNEE_ = #{roleCode}
+            AND D.KEY_ = #{key}
+            AND wh.sign_code=#{signCode}
+    </select>
+
+
+
+    <resultMap id="ViewResultMap" type="com.activiti.pojo.ViewDto">
+        <id column="ACT_ID_" jdbcType="VARCHAR" property="activitiId"/>
+        <result column="ACT_NAME_" jdbcType="VARCHAR" property="taskName"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+    </resultMap>
+
+
+    <select id="userTaskHistoryList" resultMap="ViewResultMap" parameterType="string">
+        select
+        ahi.ACT_ID_,
+        ahi.ACT_NAME_,
+        a.status
+        from
+        ACT_HI_ACTINST ahi
+        left join kb_workflow_audit a on a.taskId = ahi.TASK_ID_
+        where PROC_INST_ID_ = #{instanceId} and END_TIME_ is not null
+        order by ahi.END_TIME_
+    </select>
+</mapper>
+

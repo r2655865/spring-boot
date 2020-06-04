@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.activiti.mapper.HospitalsMapper" >
+    <resultMap id="BaseResultMap" type="com.activiti.pojo.Hospitals" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="sign_code" property="signCode" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="BOOLEAN" />
+        <result column="created" property="created" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+
+    <sql id="basic_sql">
+        a.id,a.name,a.sign_code,a.status,a.created
+    </sql>
+
+
+    <select id="selectByParams" resultMap="BaseResultMap" parameterType="map" >
+        select
+        <include refid="basic_sql"/>
+        from kb_hospitals a
+        <where>
+            <if test="signCode !='' and signCode !=null">
+                and a.sign_code = #{signCode}
+            </if>
+            <if test="status !='' and status !=null">
+                and a.status = #{status}
+            </if>
+        </where>
+    </select>
+</mapper>

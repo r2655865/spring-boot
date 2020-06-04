@@ -1,0 +1,48 @@
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: UTF-8
+#spring配置
+spring:
+  application:
+    name: ServerPatrol
+  activiti:
+    database-schema-update: false #建表
+    jpa-enabled: false
+    async-executor-activate: false
+    check-process-definitions: false
+  datasource:    #数据库连接信息
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.0.127:3306/activiti?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: '!Kbdc.321'
+  thymeleaf:
+    encoding: UTF-8
+    cache: false
+    cache-period: 0
+    mode: HTML5
+    suffix: .html
+    prefix: classpath:/templates/
+    check-template-location: false
+    check-template: false
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+  mvc:
+    static-path-pattern: /static/**
+
+#myBatis配置
+mybatis:
+  mapper-locations: classpath*:/mapping/*Mapper.xml
+  type-aliases-package: com.activiti.pojo
+flyway:
+  baseline-on-migrate: true
+  enabled: true
+  locations: classpath:/db
+logging:
+  level:
+    com.activiti.mapper: DEBUG
+
